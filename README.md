@@ -1,2 +1,2 @@
-# zammad-jira-chrome
+# zammad-jira-web
 Zammad &lt;=> Jira (Browser extension)
