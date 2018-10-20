@@ -6,7 +6,7 @@
       color="#0747a6"
     />
   </div>
-  <div class="container mt-2" v-else>
+  <div class="container issue-form mt-2" v-else>
     <div class="row">
       <div class="col">
         <div class="row">
@@ -26,7 +26,7 @@
             <label for="descriptionTextarea">Description</label>
             <textarea class="form-control" id="descriptionTextarea" rows="6" placeholder="Enter description"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-success btn-block mt-2">Create</button>
         </form>
       </div>
     </div>
@@ -35,21 +35,48 @@
 
 <script>
   import { HalfCircleSpinner } from 'epic-spinners'
+  import axios from 'axios';
 
   export default {
-    components: {
-        HalfCircleSpinner
-    },
-    data() {
-      return {
-          showLoader: true
+      components: {
+          HalfCircleSpinner
+      },
+      data() {
+        return {
+            showLoader: true,
+            issue: {
+                title: null,
+                description: null
+            }
+        }
+      },
+      mounted() {
+          this.fetchInformation();
+      },
+      methods: {
+          fetchInformation() {
+              /*const token = '';
+              let location = window.location;
+              let apiUrl = `${location.protocol}//${location.host}`;
+              let ticketId = location.path;
+
+              console.log(apiUrl);
+              console.log(ticketId);
+
+
+              axios.get(`${apiUrl}/api/v1/tickets/${ticketId}`, {
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                  })
+                  .then(response => {
+                      console.log(response);
+                  })
+                  .catch(error => {
+
+                  });*/
+          }
       }
-    },
-    mounted() {
-        setTimeout(() => {
-            this.showLoader = false;
-        }, 2000);
-    }
   }
 </script>
 
@@ -60,7 +87,15 @@
     right: 170px;
   }
 
+  .issue-form {
+    max-height: 400px;
+  }
+
   p {
     font-size: 20px;
+  }
+
+  #descriptionTextarea {
+    resize: none;
   }
 </style>
