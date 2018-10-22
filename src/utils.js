@@ -2,13 +2,13 @@
 const browser = require('webextension-polyfill');
 const regex = /(?=(([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))).*\/#ticket\/zoom\/[0-9].*/gim;
 
-export function checkZammadTicket(url) {
+function checkZammadTicket(url) {
     let test = regex.exec(url);
 
     return !!(test && test[1]);
 }
 
-export function togglePageAction(tabId, show = false) {
+function togglePageAction(tabId, show = false) {
     if (show) {
         browser.browserAction.setIcon({
             tabId,
@@ -38,4 +38,14 @@ export function togglePageAction(tabId, show = false) {
         tabId,
         popup: 'popup/not-found.html'
     })
+}
+
+function getZammadURL() {
+    return `${location.protocol}//${location.host}`;
+}
+
+export {
+    checkZammadTicket,
+    togglePageAction,
+    getZammadURL
 }
