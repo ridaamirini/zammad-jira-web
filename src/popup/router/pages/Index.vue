@@ -50,8 +50,6 @@
   import 'quill/dist/quill.snow.css'
   import 'quill/dist/quill.bubble.css'
 
-  const browser = require('webextension-polyfill');
-
   export default {
       components: {
           HalfCircleSpinner,
@@ -81,12 +79,14 @@
           if (chrome) {
               chrome.tabs.query({active: true, lastFocusedWindow: true}, this.fetchInformation);
           } else {
-              browser.tabs.query({active: true, currentWindow: true})
+              global.browser.tabs.query({active: true, currentWindow: true})
                    .then(this.fetchInformation)
           }
       },
       methods: {
           fetchInformation(tabs) {
+              console.log(this.$store.state.settings);
+
               let location = new URL(tabs[0].url);
               let apiUrl = `${location.protocol}//${location.host}`;
               let ticketId = last(location.hash.split('/'));
