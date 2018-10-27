@@ -1,12 +1,13 @@
 <template>
-  <div class="loader" v-if="showLoader">
+  <transition name="fade">
+  <div class="loader" v-if="showLoader" :key="'loader'">
     <half-circle-spinner
       :animation-duration="1000"
       :size="60"
       color="#0747a6"
     />
   </div>
-  <div class="container issue-form mt-2" v-else>
+  <div class="container issue-form mt-2" v-else :key="'form'">
     <div class="row">
       <div class="col">
         <div class="row">
@@ -20,26 +21,41 @@
         <form>
           <div class="form-group">
             <label for="summaryInput">Summary</label>
-            <input type="text" class="form-control" id="summaryInput" aria-describedby="summaryInput" placeholder="Enter summary">
+            <input type="text" class="form-control" id="summaryInput" aria-describedby="summaryInput" placeholder="Enter summary" v-model="issue.title">
           </div>
           <div class="form-group">
             <label for="descriptionTextarea">Description</label>
-            <textarea class="form-control" id="descriptionTextarea" rows="6" placeholder="Enter description"></textarea>
+            <quill-editor ref="textEditor"
+                          id="descriptionTextarea"
+                          v-model="issue.description"
+                          :options="editorOption">
+            </quill-editor>
           </div>
-          <button type="submit" class="btn btn-success btn-block mt-2">Create</button>
+          <button type="submit" class="btn btn-success btn-block mt-2 mb-1">Create</button>
         </form>
       </div>
     </div>
   </div>
+  </transition>
 </template>
 
 <script>
   import { HalfCircleSpinner } from 'epic-spinners'
+  import { last } from '../../../utils';
   import axios from 'axios';
+  import { quillEditor } from 'vue-quill-editor'
+
+  // CSS
+  import 'quill/dist/quill.core.css'
+  import 'quill/dist/quill.snow.css'
+  import 'quill/dist/quill.bubble.css'
+
+  const browser = require('webextension-polyfill');
 
   export default {
       components: {
-          HalfCircleSpinner
+          HalfCircleSpinner,
+          quillEditor
       },
       data() {
         return {
@@ -47,22 +63,33 @@
             issue: {
                 title: null,
                 description: null
-            }
+            },
+            editorOption: {
+              modules: {
+                  toolbar: [
+                      ['bold', 'italic'],
+                      ['link', 'blockquote', 'code-block', 'image'],
+                      [{ list: 'ordered' }, { list: 'bullet' }]
+                  ]
+              },
+              placeholder: 'Enter description',
+              theme: 'snow'
+          }
         }
       },
       mounted() {
-          this.fetchInformation();
+          if (chrome) {
+              chrome.tabs.query({active: true, lastFocusedWindow: true}, this.fetchInformation);
+          } else {
+              browser.tabs.query({active: true, currentWindow: true})
+                   .then(this.fetchInformation)
+          }
       },
       methods: {
-          fetchInformation() {
-              /*const token = '';
-              let location = window.location;
+          fetchInformation(tabs) {
+              let location = new URL(tabs[0].url);
               let apiUrl = `${location.protocol}//${location.host}`;
-              let ticketId = location.path;
-
-              console.log(apiUrl);
-              console.log(ticketId);
-
+              let ticketId = last(location.hash.split('/'));
 
               axios.get(`${apiUrl}/api/v1/tickets/${ticketId}`, {
                       headers: {
@@ -70,11 +97,16 @@
                       }
                   })
                   .then(response => {
-                      console.log(response);
-                  })
-                  .catch(error => {
+                      this.issue.title = '[Ticket #' + response.data.number + '] ' + response.data.title.trim();
 
-                  });*/
+                      this.hideLoader();
+                  })
+                  .catch(error => console.error(error));
+          },
+          hideLoader(delay = 800) {
+              setTimeout(() => {
+                  this.showLoader = false;
+              }, delay)
           }
       }
   }
@@ -95,7 +127,19 @@
     font-size: 20px;
   }
 
-  #descriptionTextarea {
-    resize: none;
+  #descriptionTextarea {}
+</style>
+
+<style>
+  .ql-container {
+    height: 130px !important;
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
   }
 </style>

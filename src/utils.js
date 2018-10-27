@@ -44,8 +44,13 @@ function getZammadURL() {
     return `${location.protocol}//${location.host}`;
 }
 
+function last(array) {
+    return array[array.length - 1];
+}
+
 export {
     checkZammadTicket,
     togglePageAction,
-    getZammadURL
+    getZammadURL,
+    last
 }
