@@ -20,12 +20,18 @@ export default new Vuex.Store({
               url: '',
               token: ''
           }
+      },
+      issueForm: {
+          type: null,
+          project: null
       }
   },
   getters,
   mutations,
   actions,
-  plugins: [VuexWebExtensions({
-      persistentStates: ['settings']
-  })]
+  plugins: [
+      VuexWebExtensions({
+        persistentStates: ['settings', 'issueForm']
+    })
+  ]
 })

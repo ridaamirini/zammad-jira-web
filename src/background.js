@@ -1,4 +1,5 @@
 import {checkZammadTicket, togglePageAction} from "./utils";
+import store from './store'; // For VuexWebExtensions
 
 global.browser = require('webextension-polyfill');
 

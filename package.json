@@ -16,6 +16,7 @@
     "axios": "^0.18.0",
     "core-js": "^2.5.7",
     "epic-spinners": "^1.0.3",
+    "lodash": "^4.17.11",
     "vue": "^2.5.17",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
