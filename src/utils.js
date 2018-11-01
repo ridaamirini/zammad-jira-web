@@ -48,9 +48,14 @@ function last(array) {
     return array[array.length - 1];
 }
 
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 export {
     checkZammadTicket,
     togglePageAction,
     getZammadURL,
-    last
+    last,
+    isNumeric
 }

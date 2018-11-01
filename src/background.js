@@ -6,6 +6,8 @@ global.browser = require('webextension-polyfill');
 global.browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (sender.tab && message.type === 'showPageAction') {
         togglePageAction(sender.tab.id, true);
+    } else if (sender.tab && message.type === 'hidePageAction') {
+        togglePageAction(sender.tab.id, false);
     }
 });
 

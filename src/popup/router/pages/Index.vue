@@ -20,6 +20,15 @@
       </div>
     </div>
   </div>
+  <div v-else-if="isCreated && !showLoader && !showError" :key="'success'" class="mt-2">
+    <div class="container">
+      <div class="alert alert-success" role="alert">
+        Issue <b>{{ responseIssue.key }}</b> was successfully created!
+      </div>
+      <a :href="responseIssue.link" target="_blank" class="btn btn-primary btn-lg btn-block">Open Issue</a>
+      <button type="button" class="btn btn-secondary btn-lg btn-block" @click="window.close()">Close</button>
+    </div>
+  </div>
   <div class="container issue-form mt-2" v-else :key="'form'">
     <div class="row">
       <div class="col">
@@ -76,11 +85,12 @@
 
 <script>
   import { HalfCircleSpinner } from 'epic-spinners'
-  import { last } from '../../../utils';
+  import {isNumeric, last} from '../../../utils';
   import axios from 'axios';
   import { quillEditor } from 'vue-quill-editor'
   import { mapState } from 'vuex';
   import { find } from 'lodash';
+  import * as types from './../../../store/mutation-types';
 
   // CSS
   import 'quill/dist/quill.core.css'
@@ -96,6 +106,11 @@
         return {
             showLoader: true,
             showError: null,
+            isCreated: false,
+            responseIssue: {
+                key: null,
+                link: '#',
+            },
             projects: [],
             issue: {
                 summary: null,
@@ -124,7 +139,7 @@
                   return find(this.projects, ['id', this.issue.project])['types'];
               }
           },
-          ...mapState(['settings'])
+          ...mapState(['settings', 'issueForm'])
       },
       mounted() {
           setTimeout(() => {
@@ -141,6 +156,12 @@
               let location = new URL(tabs[0].url);
               let apiUrl = this.settings.zammad.url;
               let ticketId = last(location.hash.split('/'));
+
+              if (!ticketId || !isNumeric(ticketId)) {
+                  global.browser.runtime.sendMessage({ type: 'hidePageAction' });
+
+                  return;
+              }
 
               axios.get(`${apiUrl}/api/v1/tickets/${ticketId}`, {
                       headers: {
@@ -170,6 +191,8 @@
                           }
                       });
 
+
+                      this.reselectLastParams();
                       this.hideLoader();
                   })
                   .catch(error => this.logError(error));
@@ -179,12 +202,25 @@
 
               let postData = {
                   fields: {
-                      project:
-                          {
+                      project: {
                               id: this.issue.project
-                          },
+                      },
                       summary: this.issue.summary,
-                      description: this.issue.description,
+                      description: {
+                          version: 1,
+                          type: "doc",
+                          content: [
+                              //@todo write a TextEditor for this type of description
+                              {
+                                  type: "paragraph",
+                                  content: [
+                                      {
+                                          type: "text",
+                                          text: this.issue.description
+                                      }
+                                  ]
+                              }]
+                      },
                       issuetype: {
                           id: this.issue.type
                       }
@@ -198,14 +234,39 @@
                   }
               })
                   .then(response => {
-                      // console.log(response.data);
+                      this.isCreated = true;
+                      this.responseIssue = {
+                          key: response.data.key,
+                          link: `${this.settings.atlassian.url}/browse/${response.data.key}`
+                      };
 
+                      this.rememberIssueForm();
                       this.hideLoader();
                   })
                   .catch(error => this.logError(error));
           },
-          remberIssueForm() {
+          rememberIssueForm() {
+              this.$store.commit(types.UPDATE_ISSUE_FORM, {
+                  type: this.issue.type,
+                  project: this.issue.project
+              });
+          },
+          reselectLastParams() {
+              // Set last params
+              if (this.issueForm.project && this.projects.length !== 0) {
+                  let projectIndex = this.projects.map(project => project.id)
+                                                  .indexOf(this.issueForm.project);
 
+                  if (projectIndex !== -1) {
+                      let project = this.projects[projectIndex];
+                      this.issue.project = this.issueForm.project;
+
+                      if (project.types
+                          .map(issuetype => issuetype.id)
+                          .indexOf(this.issueForm.type) !== -1)
+                          this.issue.type = this.issueForm.type;
+                  }
+              }
           },
           hideLoader(delay = 800) {
               setTimeout(() => {
