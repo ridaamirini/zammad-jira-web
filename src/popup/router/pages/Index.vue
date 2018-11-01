@@ -91,6 +91,7 @@
   import { mapState } from 'vuex';
   import { find } from 'lodash';
   import * as types from './../../../store/mutation-types';
+  import TurndownService from 'turndown';
 
   // CSS
   import 'quill/dist/quill.core.css'
@@ -157,11 +158,7 @@
               let apiUrl = this.settings.zammad.url;
               let ticketId = last(location.hash.split('/'));
 
-              if (!ticketId || !isNumeric(ticketId)) {
-                  global.browser.runtime.sendMessage({ type: 'hidePageAction' });
-
-                  return;
-              }
+              if (!ticketId || !isNumeric(ticketId)) return;
 
               axios.get(`${apiUrl}/api/v1/tickets/${ticketId}`, {
                       headers: {
@@ -200,6 +197,9 @@
           createIssue() {
               this.showLoader = true;
 
+              const turndownService = new TurndownService();
+              let markdown = turndownService.turndown(this.issue.description);
+
               let postData = {
                   fields: {
                       project: {
@@ -210,16 +210,16 @@
                           version: 1,
                           type: "doc",
                           content: [
-                              //@todo write a TextEditor for this type of description
                               {
                                   type: "paragraph",
                                   content: [
                                       {
                                           type: "text",
-                                          text: this.issue.description
+                                          text: markdown
                                       }
                                   ]
-                              }]
+                              }
+                          ]
                       },
                       issuetype: {
                           id: this.issue.type
