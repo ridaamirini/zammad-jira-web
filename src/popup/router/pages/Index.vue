@@ -37,7 +37,7 @@
             <h4>Create issue</h4>
           </div>
           <div class="col-1 p-0 mr-1 text-center">
-            <i class="fa fa-cogs"></i>
+            <i class="fa fa-cogs btn-settings" @click="openOptionsPage"></i>
           </div>
         </div>
         <form>
@@ -280,12 +280,21 @@
           clearError() {
               this.showError = null;
               this.showLoader = false;
+          },
+          openOptionsPage() {
+              if (chrome) {
+                  chrome.runtime.openOptionsPage();
+              }
           }
       }
   }
 </script>
 
 <style lang="scss" scoped>
+  .btn-settings {
+    cursor: pointer;
+  }
+
   .loader {
     position: absolute;
     top: 218px;
