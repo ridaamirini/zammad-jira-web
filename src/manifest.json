@@ -13,7 +13,7 @@
       "128": "icons/icon_128-gray.png"
     },
     "default_title": "Zammad/Jira Web",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/not-found.html"
   },
   "background": {
     "scripts": [
