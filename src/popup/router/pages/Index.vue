@@ -26,7 +26,7 @@
         Issue <b>{{ responseIssue.key }}</b> was successfully created!
       </div>
       <a :href="responseIssue.link" target="_blank" class="btn btn-primary btn-lg btn-block">Open Issue</a>
-      <button type="button" class="btn btn-secondary btn-lg btn-block" @click="window.close()">Close</button>
+      <button type="button" class="btn btn-secondary btn-lg btn-block" @click="closePopUp()">Close</button>
     </div>
   </div>
   <div class="container issue-form mt-2" v-else :key="'form'">
@@ -253,7 +253,7 @@
           },
           reselectLastParams() {
               // Set last params
-              if (this.issueForm.project && this.projects.length !== 0) {
+              if (this.issueForm && this.issueForm.project && this.projects.length !== 0) {
                   let projectIndex = this.projects.map(project => project.id)
                                                   .indexOf(this.issueForm.project);
 
@@ -280,6 +280,9 @@
           clearError() {
               this.showError = null;
               this.showLoader = false;
+          },
+          closePopUp() {
+              window.close();
           },
           openOptionsPage() {
               if (chrome) {

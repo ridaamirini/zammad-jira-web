@@ -4,10 +4,20 @@ import store from './store'; // For VuexWebExtensions
 global.browser = require('webextension-polyfill');
 
 global.browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (sender.tab && message.type === 'showPageAction') {
-        togglePageAction(sender.tab.id, true);
-    } else if (sender.tab && message.type === 'hidePageAction') {
-        togglePageAction(sender.tab.id, false);
+    if (sender.tab) {
+        switch (message.type) {
+            case 'showPageAction': togglePageAction(sender.tab.id, true);
+                break;
+            case 'hidePageAction': togglePageAction(sender.tab.id, false);
+                break;
+            case 'checkZammadUrl': {
+                togglePageAction(
+                    sender.tab.id,
+                    checkZammadTicket(sender.tab.url)
+                );
+            }
+                break;
+        }
     }
 });
 

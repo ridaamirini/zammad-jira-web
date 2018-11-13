@@ -1,14 +1,16 @@
 import store from './store';
 
 const browser = require('webextension-polyfill');
-const regex = /(?=(([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))).*\/#ticket\/zoom\/[0-9].*/gim;
 
 function checkZammadTicket(url) {
-    let test = regex.exec(url);
+    let zammadUrl = store.state.settings.zammad.url;
 
-    console.log(store.state);
+    if (!zammadUrl) return false;
 
-    return !!(test && test[1]);
+    let trailingSlash = zammadUrl.charAt(zammadUrl.length-1) === '/' ? '' : '\\/';
+    let regex = new RegExp(zammadUrl + trailingSlash + '#ticket\\/zoom\\/[0-9]*');
+
+    return regex.test(url);
 }
 
 function togglePageAction(tabId, show = false) {
