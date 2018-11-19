@@ -9,7 +9,8 @@ This web extension lets you create a issue from the [Zammad](https://zammad.com/
 
 ### Installing
 
-1. [Download](https://github.com/ridaamirini/zammad-jira-web/releases) the latest version
+1. Install Zammad/Jira Web from [Chrome Web Store](https://chrome.google.com/webstore/detail/zammadjira-web/knhicoaokhccbpkdihcfnloekimjhjgh) or
+[Download](https://github.com/ridaamirini/zammad-jira-web/releases) the latest version
 2. Enable "__Developer Mode__" in your Browser :exclamation:
 3. Unzip or Drag the release in to the Extensions page of your Browser
 4. Open the "__Option Page__" of __Zammad/Jira Web__ :point_left:
